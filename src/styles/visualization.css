@@ -1,0 +1,706 @@
+/* ============================================================
+   SchedSync — Visualization Styles
+   ============================================================
+   All visualization components: Gantt Chart, Ready Queue,
+   Memory Frames, Page Log, Controls, and Status Bar.
+   ============================================================ */
+
+/* ================================================================
+   1. GANTT CHART
+   ================================================================ */
+
+/* Gantt wrapper — horizontal scroll */
+.gantt-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: var(--space-sm);
+  scroll-behavior: smooth;
+}
+
+#gantt-chart {
+  display: flex;
+  align-items: stretch;
+  min-height: 48px;
+  gap: 2px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+}
+
+/* Single Gantt block */
+.gantt-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  padding: var(--space-xs) var(--space-sm);
+  color: white;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+  cursor: default;
+  transition: filter var(--transition-fast);
+}
+
+.gantt-block:hover {
+  filter: brightness(1.15);
+  z-index: 1;
+}
+
+/* Inner gradient for depth */
+.gantt-block::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  pointer-events: none;
+}
+
+/* Idle block */
+.gantt-block.gantt-idle {
+  background-color: var(--process-idle) !important;
+  color: var(--text-muted);
+  text-shadow: none;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Stalled block — hatched pattern */
+.gantt-block.gantt-stalled {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 4px,
+    rgba(0, 0, 0, 0.15) 4px,
+    rgba(0, 0, 0, 0.15) 8px
+  );
+}
+
+.gantt-label {
+  position: relative;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+/* Timeline axis */
+#gantt-timeline {
+  display: flex;
+  gap: 2px;
+  padding-top: var(--space-xs);
+}
+
+.gantt-tick {
+  min-width: 36px;
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+@keyframes ganttSlideIn {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+}
+
+/* Gantt panel icon */
+.gantt-panel .section-title::before {
+  content: '▐';
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  margin-right: var(--space-xs);
+}
+
+/* ================================================================
+   2. READY QUEUE
+   ================================================================ */
+
+#ready-queue {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 44px;
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
+  flex-wrap: nowrap;
+}
+
+/* Queue item */
+.queue-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-md);
+  border: 2px solid;
+  background-color: var(--bg-surface);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  transition: transform var(--transition-fast),
+              box-shadow var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.queue-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Running process — filled background */
+.queue-running {
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  border-color: transparent !important;
+  box-shadow: var(--shadow-md);
+}
+
+.queue-running .queue-item-label {
+  color: white;
+}
+
+/* CPU badge */
+.queue-cpu-badge {
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background-color: rgba(255, 255, 255, 0.25);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  color: white;
+}
+
+/* Color dot */
+.queue-color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.queue-item-label {
+  font-weight: 600;
+}
+
+/* Arrow separator */
+.queue-separator {
+  color: var(--text-muted);
+  font-size: var(--font-size-lg);
+  flex-shrink: 0;
+  animation: arrowPulse 1.5s ease infinite;
+}
+
+@keyframes arrowPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* Empty state */
+.queue-empty {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+  width: 100%;
+  text-align: center;
+  padding: var(--space-sm);
+}
+
+@keyframes queueFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Ready queue panel icon */
+.ready-queue-panel .section-title::before {
+  content: '⟩';
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  margin-right: var(--space-xs);
+}
+
+/* ================================================================
+   3. MEMORY FRAMES
+   ================================================================ */
+
+#memory-frames {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  padding: var(--space-sm) 0;
+}
+
+/* Frame slot */
+.memory-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border-color);
+  background-color: var(--bg-surface);
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.memory-frame:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+}
+
+/* Filled frame */
+.memory-frame-filled {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}
+
+/* Hit — green glow pulse */
+.memory-frame-hit {
+  border-color: var(--color-success);
+  background-color: var(--color-success-light);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+  animation: frameHitPulse 0.5s ease;
+}
+
+@keyframes frameHitPulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Fault — red shake */
+.memory-frame-fault {
+  border-color: var(--color-danger);
+  background-color: var(--color-danger-light);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+  animation: frameFaultShake 0.4s ease;
+}
+
+@keyframes frameFaultShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
+/* Empty dashed frame */
+.memory-frame-empty {
+  border-style: dashed;
+  border-color: var(--border-color);
+  background-color: transparent;
+}
+
+/* Page number */
+.frame-page-num {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.memory-frame-hit .frame-page-num { color: var(--color-success); }
+.memory-frame-fault .frame-page-num { color: var(--color-danger); }
+
+.frame-empty-label {
+  font-size: var(--font-size-lg);
+  color: var(--text-muted);
+}
+
+/* Frame index label */
+.frame-index {
+  position: absolute;
+  bottom: 2px;
+  font-size: 8px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@keyframes framePop {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Memory panel icon */
+.memory-panel .section-title::before {
+  content: '▦';
+  color: var(--color-warning);
+  font-size: var(--font-size-sm);
+  margin-right: var(--space-xs);
+}
+
+/* ================================================================
+   4. PAGE ACCESS LOG
+   ================================================================ */
+
+#page-log {
+  max-height: 140px;
+  overflow-y: auto;
+  margin-top: var(--space-md);
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+}
+
+.page-log-entry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
+  margin-bottom: 2px;
+}
+
+.page-log-entry:last-child { margin-bottom: 0; }
+
+.page-log-hit {
+  background-color: var(--color-success-light);
+}
+.page-log-hit .page-log-icon { color: var(--color-success); font-weight: 700; }
+
+.page-log-fault {
+  background-color: var(--color-danger-light);
+}
+.page-log-fault .page-log-icon { color: var(--color-danger); font-weight: 700; }
+
+.page-log-icon {
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.page-log-text {
+  flex: 1;
+  color: var(--text-secondary);
+}
+
+.page-log-pid {
+  font-size: 8px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+@keyframes logSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================================================================
+   5. CONTROLS BAR
+   ================================================================ */
+
+.controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-lg);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  gap: var(--space-md);
+  flex-shrink: 0;
+}
+
+.controls-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.controls-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.speed-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0;
+}
+
+/* Speed slider */
+.speed-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--border-color);
+  outline: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.speed-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  border: 2px solid var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.speed-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.speed-value {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  min-width: 42px;
+  text-align: right;
+}
+
+/* ================================================================
+   6. STATUS BAR
+   ================================================================ */
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  padding: var(--space-sm) var(--space-lg);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.status-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+.status-value {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.status-badge {
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  background-color: var(--bg-surface-alt);
+}
+
+.status-badge[data-status="running"] {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.status-badge[data-status="paused"] {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.status-badge[data-status="done"] {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.status-badge[data-status="stalled"] {
+  background-color: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+/* ================================================================
+   7. VIZ PANEL CLASSES FOR EACH SECTION
+   ================================================================ */
+
+.gantt-panel,
+.ready-queue-panel,
+.memory-panel {
+  position: relative;
+}
+
+/* Gantt container scroll wrapper */
+.gantt-container {
+  overflow: hidden;
+}
+
+/* Ready Queue container */
+.ready-queue-container {
+  position: relative;
+}
+
+/* Static "→ CPU" label in ready queue */
+.ready-queue-container .queue-arrow {
+  display: none; /* Replaced by JS-rendered CPU badge */
+}
+
+/* ================================================================
+   8. PERFORMANCE METRICS
+   ================================================================ */
+
+/* Metrics grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+}
+
+/* Metric card */
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-lg) var(--space-md);
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--transition-fast),
+              box-shadow var(--transition-fast),
+              border-color var(--transition-fast);
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-color-hover);
+}
+
+/* Subtle top accent stripe */
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+#metric-awt::before  { background: var(--color-primary); }
+#metric-att::before  { background: var(--color-accent); }
+#metric-pf::before   { background: var(--color-danger); }
+#metric-idle::before { background: var(--color-warning); }
+
+/* Metric value */
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+#metric-awt .metric-value  { color: var(--color-primary); }
+#metric-att .metric-value  { color: var(--color-accent); }
+#metric-pf .metric-value   { color: var(--color-danger); }
+#metric-idle .metric-value { color: var(--color-warning); }
+
+/* Metric label */
+.metric-label {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+/* Metrics panel icon */
+.metrics-panel .section-title::before {
+  content: '◑';
+  color: var(--color-success);
+  font-size: var(--font-size-sm);
+  margin-right: var(--space-xs);
+}
+
+/* When metrics have real values — pop animation */
+.metric-card.metric-updated {
+  animation: metricPop 0.4s ease;
+}
+
+@keyframes metricPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Responsive: 2 cols on narrow panels */
+@media (max-width: 900px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

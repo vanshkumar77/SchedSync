@@ -1,0 +1,43 @@
+{
+  "name": "schedsync",
+  "version": "1.0.0",
+  "description": "SchedSync — A desktop-based CPU Scheduling & Memory Paging Simulator with step-by-step visualization",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder"
+  },
+  "keywords": [
+    "cpu-scheduling",
+    "memory-paging",
+    "simulator",
+    "electron",
+    "os-visualizer",
+    "fcfs",
+    "sjf",
+    "srtf",
+    "round-robin",
+    "fifo",
+    "lru"
+  ],
+  "author": "Amritesh Mishra & Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.schedsync.app",
+    "productName": "SchedSync",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  }
+}

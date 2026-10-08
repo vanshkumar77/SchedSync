@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
+  <meta name="description" content="SchedSync — A desktop-based CPU Scheduling and Memory Paging Simulator with step-by-step visualization">
+  <title>SchedSync — CPU Scheduling & Memory Paging Simulator</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/header.css">
+  <link rel="stylesheet" href="styles/footer.css">
+  <link rel="stylesheet" href="styles/input-panel.css">
+  <link rel="stylesheet" href="styles/visualization.css">
+</head>
+<body>
+
+  <!-- ============================================================ -->
+  <!-- HEADER                                                       -->
+  <!-- ============================================================ -->
+  <header class="app-header" id="app-header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-icon">⏱</span>
+        <h1 class="logo-text">SchedSync</h1>
+      </div>
+      <span class="header-subtitle">CPU Scheduling & Memory Paging Simulator</span>
+    </div>
+    <div class="header-right">
+      <button class="theme-toggle-btn" id="theme-toggle" title="Toggle Light/Dark Mode" aria-label="Toggle theme">
+        <span class="theme-icon" id="theme-icon">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- MAIN CONTENT                                                 -->
+  <!-- ============================================================ -->
+  <main class="app-main" id="app-main">
+
+    <!-- ========== LEFT SIDEBAR — INPUT PANEL ========== -->
+    <aside class="input-panel" id="input-panel">
+
+      <!-- Process Input Form -->
+      <section class="panel-section" id="process-input-section">
+        <h2 class="section-title">Add Process</h2>
+        <form id="process-form" class="process-form" autocomplete="off">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pid-input">Process ID</label>
+              <input type="text" id="pid-input" placeholder="e.g. P1" required>
+            </div>
+            <div class="form-group">
+              <label for="arrival-input">Arrival Time</label>
+              <input type="number" id="arrival-input" placeholder="0" min="0" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="burst-input">Burst Time</label>
+              <input type="number" id="burst-input" placeholder="1" min="1" required>
+            </div>
+            <div class="form-group">
+              <label for="pages-input">Page References</label>
+              <input type="text" id="pages-input" placeholder="e.g. 1,2,3,1,4">
+            </div>
+          </div>
+          <div class="form-row" id="priority-group" style="display: none;">
+            <div class="form-group">
+              <label for="priority-input">Priority <small>(lower = higher)</small></label>
+              <input type="number" id="priority-input" placeholder="1" min="0" max="100" value="0">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="add-process-btn">
+            <span>+ Add Process</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Process Table -->
+      <section class="panel-section" id="process-table-section">
+        <h2 class="section-title">Process List</h2>
+        <div class="table-wrapper" id="process-table-wrapper">
+          <table class="process-table" id="process-table">
+            <thead>
+              <tr>
+                <th>PID</th>
+                <th>AT</th>
+                <th>BT</th>
+                <th>Pri</th>
+                <th>Pages</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="process-table-body">
+              <!-- Rows added dynamically -->
+            </tbody>
+          </table>
+          <p class="empty-state" id="empty-state">No processes added yet.</p>
+        </div>
+        <button class="btn btn-danger btn-sm" id="clear-all-btn" title="Remove all processes">
+          Clear All
+        </button>
+      </section>
+
+      <!-- Algorithm & Config Selection -->
+      <section class="panel-section" id="config-section">
+        <h2 class="section-title">Configuration</h2>
+
+        <div class="form-group">
+          <label for="cpu-algorithm-select">CPU Scheduling Algorithm</label>
+          <select id="cpu-algorithm-select">
+            <option value="fcfs">FCFS — First Come First Served</option>
+            <option value="sjf">SJF — Shortest Job First</option>
+            <option value="srtf">SRTF — Shortest Remaining Time</option>
+            <option value="rr">Round Robin</option>
+            <option value="priority">Priority — Non-preemptive</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="quantum-group" style="display: none;">
+          <label for="quantum-input">Time Quantum</label>
+          <input type="number" id="quantum-input" placeholder="2" min="1" value="2">
+        </div>
+
+        <div class="form-group">
+          <label for="paging-algorithm-select">Paging Algorithm</label>
+          <select id="paging-algorithm-select">
+            <option value="fifo">FIFO — First In First Out</option>
+            <option value="lru">LRU — Least Recently Used</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="frames-input">Memory Frames</label>
+          <input type="number" id="frames-input" placeholder="3" min="1" max="10" value="3">
+        </div>
+
+        <div class="form-group">
+          <label for="stall-input">Page Fault Stall Time</label>
+          <input type="number" id="stall-input" placeholder="1" min="0" max="5" value="1">
+        </div>
+      </section>
+
+    </aside>
+
+    <!-- ========== RIGHT — VISUALIZATION AREA ========== -->
+    <div class="visualization-area" id="visualization-area">
+
+      <!-- Simulation Controls -->
+      <section class="controls-bar" id="controls-bar">
+        <div class="controls-left">
+          <button class="btn btn-accent" id="step-btn" title="Advance one time unit">
+            ⏭ Step
+          </button>
+          <button class="btn btn-accent" id="play-btn" title="Auto-run simulation">
+            ▶ Play
+          </button>
+          <button class="btn btn-secondary" id="reset-btn" title="Reset simulation">
+            ↺ Reset
+          </button>
+        </div>
+        <div class="controls-right">
+          <label for="speed-slider" class="speed-label">Speed:</label>
+          <input type="range" id="speed-slider" min="100" max="2000" value="500" step="100" class="speed-slider">
+          <span class="speed-value" id="speed-value">500ms</span>
+        </div>
+      </section>
+
+      <!-- Current Status Bar -->
+      <section class="status-bar" id="status-bar">
+        <div class="status-item">
+          <span class="status-label">Time:</span>
+          <span class="status-value" id="current-time">0</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Running:</span>
+          <span class="status-value" id="current-process">—</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Status:</span>
+          <span class="status-value status-badge" id="sim-status">Idle</span>
+        </div>
+      </section>
+
+      <!-- Gantt Chart -->
+      <section class="viz-panel gantt-panel" id="gantt-panel">
+        <h2 class="section-title">Gantt Chart</h2>
+        <div class="gantt-container gantt-wrapper" id="gantt-container">
+          <div class="gantt-chart" id="gantt-chart">
+            <!-- Gantt blocks rendered dynamically -->
+          </div>
+          <div class="gantt-timeline" id="gantt-timeline">
+            <!-- Timeline ticks rendered dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Ready Queue -->
+      <section class="viz-panel ready-queue-panel" id="ready-queue-panel">
+        <h2 class="section-title">Ready Queue</h2>
+        <div class="ready-queue-container" id="ready-queue-container">
+          <div class="queue-arrow">→ CPU</div>
+          <div class="ready-queue" id="ready-queue">
+            <!-- Queue items rendered dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Memory Frames -->
+      <section class="viz-panel memory-panel" id="memory-panel">
+        <h2 class="section-title">Memory Frames</h2>
+        <div class="memory-container" id="memory-container">
+          <div class="memory-frames" id="memory-frames">
+            <!-- Frame blocks rendered dynamically -->
+          </div>
+          <div class="page-log" id="page-log">
+            <!-- Page access log rendered dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Performance Metrics -->
+      <section class="viz-panel metrics-panel" id="metrics-panel">
+        <h2 class="section-title">Performance Metrics</h2>
+        <div class="metrics-grid" id="metrics-grid">
+          <div class="metric-card" id="metric-awt">
+            <span class="metric-value">—</span>
+            <span class="metric-label">Avg Waiting Time</span>
+          </div>
+          <div class="metric-card" id="metric-att">
+            <span class="metric-value">—</span>
+            <span class="metric-label">Avg Turnaround Time</span>
+          </div>
+          <div class="metric-card" id="metric-pf">
+            <span class="metric-value">—</span>
+            <span class="metric-label">Total Page Faults</span>
+          </div>
+          <div class="metric-card" id="metric-idle">
+            <span class="metric-value">—</span>
+            <span class="metric-label">CPU Idle Time</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- ============================================================ -->
+  <!-- FOOTER                                                       -->
+  <!-- ============================================================ -->
+  <footer class="app-footer" id="app-footer">
+    <span class="footer-text">Made by <strong>Amritesh Mishra & Team</strong></span>
+    <span class="footer-version" id="footer-version"></span>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/theme.js"></script>
+  <script src="js/algorithms/fcfs.js"></script>
+  <script src="js/algorithms/sjf.js"></script>
+  <script src="js/algorithms/srtf.js"></script>
+  <script src="js/algorithms/round-robin.js"></script>
+  <script src="js/algorithms/priority.js"></script>
+  <script src="js/algorithms/fifo-paging.js"></script>
+  <script src="js/algorithms/lru-paging.js"></script>
+  <script src="js/visualization/gantt-chart.js"></script>
+  <script src="js/visualization/ready-queue.js"></script>
+  <script src="js/visualization/memory-frames.js"></script>
+  <script src="js/simulation-engine.js"></script>
+  <script src="js/process-manager.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/controls.js"></script>
+
+</body>
+</html>

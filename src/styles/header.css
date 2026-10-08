@@ -1,0 +1,97 @@
+/* ============================================================
+   SchedSync — Header Styles
+   ============================================================ */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-xl);
+  background: var(--bg-header);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  z-index: var(--z-header);
+  position: relative;
+}
+
+/* ---- Left: Logo + Subtitle ---- */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.logo-icon {
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+}
+
+.logo-text {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+.header-subtitle {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-weight: 400;
+  padding-left: var(--space-lg);
+  border-left: 1px solid var(--border-color);
+}
+
+/* ---- Right: Theme Toggle ---- */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface-alt);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--border-color-hover);
+  background-color: var(--bg-surface-hover);
+  transform: scale(1.05);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+.theme-icon {
+  font-size: 1.1rem;
+  transition: transform var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle-btn:hover .theme-icon {
+  transform: rotate(20deg);
+}
